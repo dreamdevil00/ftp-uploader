@@ -1,10 +1,3 @@
-# ftp-uploader
-
-A simple ftp uploader with queue management.
-
-## Example
-
-```
 import {
   Uploader,
   ICredential,
@@ -45,18 +38,17 @@ uploader.onConnectionError = function connectionError(error) {
   console.log(`连接出错: ${error.message}`);
 };
 
-
+/*
 uploader.onProgress = function progress(pro: IProgress) {
   console.log(`progress: `, pro);
-};
+}; */
 
 const file: IFileItem = {
-  name: 'demo.exe',
-  localPath: 'E:\\demo\\demo.exe',
-  serverPath: '/demo.exe',
+  name: 'vs2015.com_chs.iso',
+  localPath: 'E:\\开发\\环境搭建\\strongloop\\vs2015\\vs2015.com_chs.iso',
+  serverPath: '/vs2015.com_chs.iso',
   size: 4013920256,
   isDirectory: false,
 };
 
 uploader.upload([file]);
-```

@@ -1,0 +1,37 @@
+{
+  "name": "ftp-uploader",
+  "version": "0.1.0",
+  "description": "A simple ftp uploader with queue management",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run lint:fix && tsc",
+    "lint": "tslint --project tsconfig.json --config tslint.json",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dreamdevil00/ftp-uploader.git"
+  },
+  "keywords": [],
+  "author": "dreamdevil00",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dreamdevil00/ftp-uploader/issues"
+  },
+  "homepage": "https://github.com/dreamdevil00/ftp-uploader#readme",
+  "dependencies": {
+    "@icetee/ftp": "^1.0.3",
+    "bluebird": "^3.5.2",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.24",
+    "@types/node": "^10.10.1",
+    "@types/uuid": "^3.4.4",
+    "rimraf": "^2.6.2",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.3"
+  }
+}
