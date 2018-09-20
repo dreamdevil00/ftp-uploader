@@ -12,5 +12,6 @@
     "target": "es5",
     "lib": ["es2017", "dom"]
   },
-  "include": ["./src/**/*", "./typings/**/*"]
+  "include": ["./src/**/*", "./test/**/*", "./typings/**/*"],
+  "exclude": ["node_modules"]
 }
