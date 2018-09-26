@@ -1,4 +1,4 @@
-# ftp-uploader
+# smart-uploader
 
 A simple ftp uploader with queue management.
 
@@ -12,7 +12,7 @@ import {
   FileItem,
   IFileItem,
   IProgress,
-} from '../src';
+} from 'smart-uploader';
 
 const cre: ICredential = {
   host: '127.0.0.1',
