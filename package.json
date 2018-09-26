@@ -1,5 +1,5 @@
 {
-  "name": "ftp-uploader",
+  "name": "smart-uploader",
   "version": "0.1.1",
   "description": "A simple ftp uploader with queue management",
   "main": "dist/src/index.js",
