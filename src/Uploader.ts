@@ -1,15 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  Behavior,
-  ICredential,
-  IFileItem,
-  ItemStatus,
-  IProgress,
-} from './types';
-import { FileItem } from './FileItem';
-import { FtpClient } from './FtpClient';
-import { Queue } from './Queue';
+import {Behavior, ICredential, IFileItem, ItemStatus, IProgress} from './types';
+import {FileItem} from './FileItem';
+import {FtpClient} from './FtpClient';
+import {Queue} from './Queue';
 
 export class Uploader {
   private isUploading = false;
@@ -28,14 +22,21 @@ export class Uploader {
   private stepTimeout: NodeJS.Timer | null = null;
   private rdStream: fs.ReadStream | null = null;
 
-  private connectionError: Error | null = null;
-  constructor(config: { credentials: ICredential; behavior: Behavior }) {
-    const { credentials, behavior } = config;
+  constructor(config: {credentials: ICredential; behavior: Behavior}) {
+    const {credentials, behavior} = config;
     this.queue = new Queue();
     this.ftpClient = new FtpClient(credentials, behavior);
 
     this.ftpClient.on('error', (error) => {
-      this.connectionError = error;
+      this.onConnectionError(error);
+    });
+
+    this.ftpClient.on('end', () => {
+      this.onConnectionEnd();
+    });
+
+    this.ftpClient.on('close', () => {
+      this.onConnectionClose();
     });
 
     this.onInit();
@@ -63,15 +64,18 @@ export class Uploader {
     }
   }
 
-  onInit() {}
-  onBeforeUploadItem(item: FileItem | null) {}
-  onAfterUploadItem(item: FileItem | null) {}
-  onErrorUploadItem(item: FileItem | null) {}
-  onConnectionError(error: Error) {}
-  onFinished() {}
-  onProgress(progress: IProgress) {}
+  onInit(): void {}
+  onBeforeUploadItem(item: FileItem | null): void {}
+  onAfterUploadItem(item: FileItem | null): void {}
+  onErrorUploadItem(item: FileItem | null): void {}
+  onConnectionError(error: Error): void {}
+  onConnectionEnd(): void {}
+  onConnectionClose(): void {}
+  onFinished(): void {}
 
-  private startUpload() {
+  onProgress(progress: IProgress): void {}
+
+  private startUpload(): void {
     const item = this.queue.nextReadyItem();
 
     if (item) {
@@ -81,7 +85,7 @@ export class Uploader {
     }
   }
 
-  private step(rdStreamOrSize: fs.ReadStream | number, item: FileItem) {
+  private step(rdStreamOrSize: fs.ReadStream | number, item: FileItem): void {
     const transferred =
       typeof rdStreamOrSize === 'number'
         ? rdStreamOrSize
@@ -126,8 +130,8 @@ export class Uploader {
     this.lastTransferred = transferred;
   }
 
-  private uploadItem(item: FileItem) {
-    const { localPath, isDirectory, serverPath } = item;
+  private uploadItem(item: FileItem): void {
+    const {localPath, isDirectory, serverPath} = item;
     const serverDirectory = path.dirname(serverPath);
 
     this.onBeforeUploadItem(item);
@@ -154,13 +158,14 @@ export class Uploader {
     );
   }
 
-  private makeSureDirExist(dir: string): Promise<any> {
+  private makeSureDirExist(dir: string): Promise<void> {
     return this.ftpClient
       .readdir(dir)
+      .then(() => {})
       .catch((err) => this.ftpClient.mkdirRecursive(dir));
   }
 
-  private error(item: FileItem, err: string) {
+  private error(item: FileItem, err: string): void {
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
       this.stepTimeout = null;
@@ -168,7 +173,7 @@ export class Uploader {
     this.errorUploadItem(item, err);
   }
 
-  private complete(item: FileItem) {
+  private complete(item: FileItem): void {
     this.step(item.size, item);
     if (this.stepTimeout) {
       clearTimeout(this.stepTimeout);
@@ -177,7 +182,7 @@ export class Uploader {
     this.completeUploadItem(item);
   }
 
-  private stepRecursive(item: FileItem) {
+  private stepRecursive(item: FileItem): void {
     const self = this;
     this.stepTimeout = setTimeout(function statFunc() {
       if (self.rdStream) {
@@ -187,8 +192,8 @@ export class Uploader {
     }, 500);
   }
 
-  private startTransfer(item: FileItem) {
-    const { localPath, serverPath } = item;
+  private startTransfer(item: FileItem): void {
+    const {localPath, serverPath} = item;
     this.rdStream = fs.createReadStream(localPath);
 
     this.ftpClient
@@ -202,12 +207,12 @@ export class Uploader {
     this.stepRecursive(item);
   }
 
-  private readyUploadItem(item: FileItem) {
+  private readyUploadItem(item: FileItem): void {
     this.currentUploadingId = item.id;
     this.queue.setItemStatus(item, ItemStatus.Uploading);
   }
 
-  private completeUploadItem(item: FileItem) {
+  private completeUploadItem(item: FileItem): void {
     this.queue.setItemStatus(item, ItemStatus.Complete);
     this.queue.setItemTransferred(item, item.size);
 
@@ -216,14 +221,14 @@ export class Uploader {
     this.startUpload();
   }
 
-  private errorUploadItem(item: FileItem, errMessage: string) {
+  private errorUploadItem(item: FileItem, errMessage: string): void {
     this.queue.setItemStatus(item, ItemStatus.Error, errMessage);
     this.onErrorUploadItem(this.queue.getItemById(item.id));
 
     this.startUpload();
   }
 
-  private uploadQueueFinished() {
+  private uploadQueueFinished(): void {
     this.isUploading = false;
     this.isFinished = true;
 

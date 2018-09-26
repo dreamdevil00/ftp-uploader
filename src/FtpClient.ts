@@ -1,10 +1,9 @@
 import * as fs from 'fs';
 import * as Client from '@icetee/ftp';
 import * as path from 'path';
-import { Behavior, ICredential } from './types';
-import { EventEmitter } from 'events';
-import * as util from 'util';
-import { promisifyAll } from 'bluebird';
+import {Behavior, ICredential} from './types';
+import {EventEmitter} from 'events';
+import {promisifyAll} from 'bluebird';
 
 export class FtpClient extends EventEmitter {
   private ftp: Client | null = null;
@@ -43,6 +42,7 @@ export class FtpClient extends EventEmitter {
             this.disconnect();
           })
           .on('close', () => {
+            this.emit('close');
             this.disconnect();
           });
 
@@ -61,7 +61,7 @@ export class FtpClient extends EventEmitter {
     }
   }
 
-  mkdirRecursive(directory: string): Promise<null> {
+  mkdirRecursive(directory: string): Promise<void> {
     const isWin = process.platform;
     const dir = isWin
       ? path
@@ -148,7 +148,7 @@ export class FtpClient extends EventEmitter {
 
   stat(
     filePath: string,
-  ): Promise<null | { filename: string; path: string; size: number }> {
+  ): Promise<null | {filename: string; path: string; size: number}> {
     return this.getConnection().then((connection) => {
       const dir = path.win32.dirname(filePath);
       return (connection as any)
