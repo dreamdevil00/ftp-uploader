@@ -1,6 +1,6 @@
-import { FileItem } from './FileItem';
-import { IFileItem, ItemStatus } from './types';
-import { EventEmitter } from 'events';
+import {FileItem} from './FileItem';
+import {IFileItem, ItemStatus} from './types';
+import {EventEmitter} from 'events';
 export class Queue extends EventEmitter {
   private queue: FileItem[] = [];
   constructor() {
@@ -11,7 +11,7 @@ export class Queue extends EventEmitter {
     return this.queue.length;
   }
 
-  get statusCount(): { finished: number; error: number } {
+  get statusCount(): {finished: number; error: number} {
     let finishedCount = 0;
     let errorCount = 0;
     for (const item of this.queue) {
@@ -52,7 +52,7 @@ export class Queue extends EventEmitter {
    * @memberof Queue
    */
   removeItemById(id: number | string): FileItem | null {
-    const { item, position } = this.getItemWithPosition(id);
+    const {item, position} = this.getItemWithPosition(id);
 
     if (position !== -1) {
       this.queue.splice(position, 1);
@@ -126,7 +126,7 @@ export class Queue extends EventEmitter {
     status: ItemStatus,
     error?: string,
   ): void {
-    const { position } = this.getItemWithPosition(id);
+    const {position} = this.getItemWithPosition(id);
     if (position !== -1) {
       this.queue[position].status = status;
       this.queue[position].error = error || null;
@@ -142,7 +142,7 @@ export class Queue extends EventEmitter {
    * @memberof Queue
    */
   setItemStatus(item: FileItem, status: ItemStatus, error?: string): void {
-    const { id } = item;
+    const {id} = item;
     this.setItemStatusById(id, status, error);
   }
 
@@ -154,7 +154,7 @@ export class Queue extends EventEmitter {
    * @memberof Queue
    */
   setItemTransferred(item: FileItem, transferred: number): void {
-    const { id } = item;
+    const {id} = item;
     for (const obj of this.queue) {
       if (obj.id === id) {
         obj.setTransferred(transferred);
@@ -170,7 +170,7 @@ export class Queue extends EventEmitter {
    * @memberof Queue
    */
   updateItemTransferred(item: FileItem, transferred: number): void {
-    const { id } = item;
+    const {id} = item;
     for (const obj of this.queue) {
       if (obj.id === id) {
         obj.setTransferred(transferred);
@@ -193,9 +193,23 @@ export class Queue extends EventEmitter {
     return null;
   }
 
+  /**
+   * 获取正在传输的文件项
+   * @returns {(FileItem | null)}
+   * @memberof Queue
+   */
+  getUploadingItem(): FileItem | null {
+    for (const item of this.queue) {
+      if (item.status === ItemStatus.Uploading) {
+        return Object.assign({}, item);
+      }
+    }
+    return null;
+  }
+
   private getItemWithPosition(
     id: number | string,
-  ): { item: FileItem | null; position: number } {
+  ): {item: FileItem | null; position: number} {
     for (let i = 0; i < this.queue.length; i++) {
       const item = this.queue[i];
       if (item.id === id) {

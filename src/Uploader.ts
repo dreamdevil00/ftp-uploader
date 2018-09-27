@@ -53,6 +53,14 @@ export class Uploader {
     };
   }
 
+  get uploadingItem(): FileItem | null {
+    return this.queue.getUploadingItem();
+  }
+
+  getQueue(): FileItem[] {
+    return this.queue.getItems();
+  }
+
   upload(files: IFileItem[]) {
     if (files.length > 0) {
       this.queue.bulkAddItems(files);
