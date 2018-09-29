@@ -1,6 +1,6 @@
 {
   "name": "smart-uploader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A simple ftp uploader with queue management",
   "main": "dist/src/index.js",
   "scripts": {
