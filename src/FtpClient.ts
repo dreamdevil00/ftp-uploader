@@ -80,6 +80,9 @@ export class FtpClient extends EventEmitter {
         case Behavior.Cover:
           return (connection as any).putAsync(localPath, serverPath);
         case Behavior.Skip:
+          if (typeof localPath !== 'string') {
+            (localPath as fs.ReadStream).destroy();
+          }
           return Promise.resolve(null);
         case Behavior.Verify:
         default:
@@ -95,6 +98,11 @@ export class FtpClient extends EventEmitter {
                   .then(() =>
                     (connection as any).putAsync(localPath, serverPath),
                   );
+              } else {
+                if (typeof localPath !== 'string') {
+                  (localPath as fs.ReadStream).destroy();
+                }
+                return Promise.resolve(null);
               }
             } else {
               return (connection as any).putAsync(localPath, serverPath);
