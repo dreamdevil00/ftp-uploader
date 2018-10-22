@@ -169,7 +169,7 @@ export class FtpClient extends EventEmitter {
               return {
                 filename: path.basename(filePath),
                 path: filePath,
-                size: item.size,
+                size: +item.size,
               };
             }
           }
